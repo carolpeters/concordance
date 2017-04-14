@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>cc @ bootstrap</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div id="a" class="container">
+      <form id="gettext">
+        <div>
+          <label id="textbox-label">Insert text:</label>
+        </div>
+        <div>
+          <textarea name="textblock" id="textbox" rows="10" cols="40" autofocus>
+          </textarea>
+        </div>
+        <div class="button">
+          <button type="submit" onclick="processText()">submit
+          </button>
+        </div>
+      </form>
+      <br>
+      <h6 id="doing"></h6>
+      <h6 id="done"><h6>
+      <ul id="list" style="list-style-type:none">
+      </ul>
+    </div>
+    <div id="b" class="container">
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+    function processText () {
+      document.getElementById("doing").innerHTML
+        = "creating concordance . . .";
+    }
+    var form = document.getElementById("gettext");
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      var text = form.textblock.value;
+      text = text.toLowerCase();
+      var wordCount = 0;
+      var charCount = 0;
+      var currentWord = [];
+      var words = [];
+      collectingWord = false;
+      function arrayCompare (a1, a2) {
+        if (a1.length != a2.length) {
+          return false;
+        }
+        for (k = 0; k < a1.length; k++) {
+          if (a1[k] !== a2[k]) {
+            return false;
+          }
+        }
+        return true;
+      }
+      function doesWordExist (word) {
+        for (j = 0; j < words.length; j++) {
+          if (arrayCompare (words[j].word, word)) {
+            words[j].num++;
+            return true;
+          }
+        }
+        return false;
+      }
+      for (i = 0; i < text.length; i++) {
+        if ((text[i] === ' ') || (text[i] === '\n')
+          || (text[i] === '—') || (text[i] === ',')
+          || (text[i] === '.') || (text[i] === '!')
+          || (text[i] === '?') || (text[i] === ':')
+          || (text[i] === ';') || (text[i] === '(')
+          || (text[i] === ')') || (text[i] === '&')) {
+          if (collectingWord) {
+            wordCount++;
+            // check to see if word already exists
+            if (!doesWordExist (currentWord)) {
+              words.push ({
+                num: 1,
+                word: currentWord
+              });
+            }
+            collectingWord = false;
+            charCount = 0;
+            currentWord = [];
+          }
+        } else {
+          collectingWord = true;
+          currentWord[charCount] = text[i];
+          charCount++;
+          }
+        }
+      if (collectingWord) {
+        if (!doesWordExist (currentWord)) {
+          words.push ({
+            num: 1,
+            word: currentWord
+          });
+        }
+      }
+      words.sort(function (a, b) {
+        return +(a.word > b.word) ||
+        +(a.word === b.word) -1;
+      });
+      document.getElementById("doing").innerHTML
+        = "";
+      document.getElementById("done").innerHTML
+          = "word/frequency list:";
+      for (i = 0; i < words.length; i++) {
+        var node = document.createElement('li');
+        var stg = words[i].word.join("");
+        var textnode = document.createTextNode(
+            words[i].num + ' ' + stg);
+        node.appendChild(textnode);
+        document.getElementById("list").appendChild(node);
+//        newE.appendChild(newContent);
+//        var currentE = document.getElementById('b');
+//        document.body.insertBefore(newE, currentE);
+      }
+    }
+    </script>
+  </body>
+</html>
